@@ -1,0 +1,64 @@
+@model IEnumerable<NotesApplication.Models.Note>
+
+@{
+    ViewBag.Title = "My Notes";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Notes</h2>
+        <a href="@Url.Action("Create", "Notes")" class="btn btn-success">
+            <i class="fa fa-plus"></i> Create New Note
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <p>You don't have any notes yet. Click the "Create New Note" button to get started!</p>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between">
+                            <h5 class="card-title mb-0 text-truncate">@item.Title</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                @if (item.Content != null && item.Content.Length > 150)
+                                {
+                                    @item.Content.Substring(0, 150)<text>...</text>
+                                }
+                                else
+                                {
+                                    @item.Content
+                                }
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">Created: @item.CreatedAt.ToString("MMM dd, yyyy")</small>
+                                <div>
+                                    <a href="@Url.Action("Details", "Notes", new { id = item.Id })" class="btn btn-sm btn-info">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+                                    <a href="@Url.Action("Edit", "Notes", new { id = item.Id })" class="btn btn-sm btn-primary">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a href="@Url.Action("Delete", "Notes", new { id = item.Id })" class="btn btn-sm btn-danger">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,43 @@
+@model NotesApplication.Models.Note
+
+@{
+    ViewBag.Title = "Note Details";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h4>@Model.Title</h4>
+            <div>
+                <a href="@Url.Action("Edit", "Notes", new { id = Model.Id })" class="btn btn-light btn-sm">
+                    <i class="fa fa-edit"></i> Edit
+                </a>
+                <a href="@Url.Action("Index", "Notes")" class="btn btn-light btn-sm">
+                    <i class="fa fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="card-text">@Model.Content</p>
+        </div>
+        <div class="card-footer text-muted">
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Created:</strong> @Model.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")
+                </div>
+                <div class="col-md-6 text-right">
+                    @if (Model.UpdatedAt.HasValue)
+                    {
+                        <strong>Last Updated:</strong> @Model.UpdatedAt.Value.ToString("MMM dd, yyyy hh:mm tt")
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-3">
+        <a href="@Url.Action("Delete", "Notes", new { id = Model.Id })" class="btn btn-danger">
+            <i class="fa fa-trash"></i> Delete Note
+        </a>
+    </div>
+</div>
