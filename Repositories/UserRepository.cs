@@ -1,5 +1,6 @@
 using NotesApplication.Interfaces;
 using NotesApplication.Models;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace NotesApplication.Repositories
             return _context.Users.ToList();
         }
 
-        public User GetById(int id)
+        public User GetById(Guid id)
         {
             return _context.Users.Find(id);
         }
@@ -37,6 +38,8 @@ namespace NotesApplication.Repositories
 
         public void Add(User user)
         {
+            if (user.Id == Guid.Empty)
+                user.Id = Guid.NewGuid();
             _context.Users.Add(user);
             _context.SaveChanges();
         }
@@ -47,7 +50,7 @@ namespace NotesApplication.Repositories
             _context.SaveChanges();
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             var user = _context.Users.Find(id);
             if (user != null)

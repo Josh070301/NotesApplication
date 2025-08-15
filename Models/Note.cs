@@ -7,7 +7,7 @@ namespace NotesApplication.Models
     public class Note
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
         [MaxLength(200)]
@@ -16,12 +16,12 @@ namespace NotesApplication.Models
         public string Content { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        
+
         public DateTime? UpdatedAt { get; set; }
-        
+
         [ForeignKey("User")]
-        public int UserId { get; set; }
-        
+        public Guid UserId { get; set; }
+
         public virtual User User { get; set; }
     }
 }

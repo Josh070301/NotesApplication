@@ -81,6 +81,10 @@ namespace NotesApplication.Controllers
                         HttpOnly = true,
                         Expires = DateTime.Now.AddDays(7)
                     });
+
+                    // Set the current user principal, refers to the security context of the user, which includes their identity (who they are) and their claims (such as user ID, username, email, roles, etc.).
+                    var principal = JwtHelper.ValidateToken(token);
+                    HttpContext.User = principal;
                     
                     return RedirectToAction("Index", "Notes");
                 }

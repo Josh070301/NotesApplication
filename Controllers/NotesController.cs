@@ -1,14 +1,18 @@
+using NotesApplication.Filters;
 using NotesApplication.Helpers;
 using NotesApplication.Interfaces;
+using NotesApplication.ViewModels;
 using NotesApplication.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 
 namespace NotesApplication.Controllers
 {
-    [Authorize]
+    [JwtAuthorize]
     public class NotesController : Controller
     {
         private readonly INoteRepository _noteRepository;
@@ -19,21 +23,55 @@ namespace NotesApplication.Controllers
         }
 
         // GET: Notes
-        public ActionResult Index()
+        public ActionResult Index(NoteFilterViewModel filter)
         {
             var userId = GetCurrentUserId();
-            if (userId == 0)
+            if (userId == Guid.Empty)
                 return RedirectToAction("Login", "Account");
                 
-            var notes = _noteRepository.GetAllByUserId(userId);
-            return View(notes);
+            IEnumerable<Note> notes = _noteRepository.GetAllByUserId(userId);
+            
+            // Apply filtering
+            if (!string.IsNullOrEmpty(filter.TitleSearch))
+            {
+                notes = notes.Where(n => n.Title.Contains(filter.TitleSearch, StringComparison.OrdinalIgnoreCase));
+            }
+            
+            if (!string.IsNullOrEmpty(filter.ContentSearch))
+            {
+                notes = notes.Where(n => n.Content != null && 
+                              n.Content.Contains(filter.ContentSearch, StringComparison.OrdinalIgnoreCase));
+            }
+            
+            // Apply sorting
+            if (filter.CreatedAtSortOrder == SortOrder.Ascending)
+            {
+                notes = notes.OrderBy(n => n.CreatedAt);
+            }
+            else if (filter.CreatedAtSortOrder == SortOrder.Descending)
+            {
+                notes = notes.OrderByDescending(n => n.CreatedAt);
+            }
+            
+            if (filter.UpdatedAtSortOrder == SortOrder.Ascending)
+            {
+                notes = notes.OrderBy(n => n.UpdatedAt);
+            }
+            else if (filter.UpdatedAtSortOrder == SortOrder.Descending)
+            {
+                notes = notes.OrderByDescending(n => n.UpdatedAt);
+            }
+            
+            // Pass both notes and filter model to view
+            ViewBag.Filter = filter;
+            return View(notes.ToList());
         }
 
         // GET: Notes/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(Guid id)
         {
             var userId = GetCurrentUserId();
-            if (userId == 0)
+            if (userId == Guid.Empty)
                 return RedirectToAction("Login", "Account");
                 
             var note = _noteRepository.GetById(id);
@@ -47,7 +85,7 @@ namespace NotesApplication.Controllers
         // GET: Notes/Create
         public ActionResult Create()
         {
-            if (GetCurrentUserId() == 0)
+            if (GetCurrentUserId() == Guid.Empty)
                 return RedirectToAction("Login", "Account");
                 
             return View();
@@ -59,7 +97,7 @@ namespace NotesApplication.Controllers
         public ActionResult Create(Note note)
         {
             var userId = GetCurrentUserId();
-            if (userId == 0)
+            if (userId == Guid.Empty)
                 return RedirectToAction("Login", "Account");
                 
             if (ModelState.IsValid)
@@ -76,10 +114,10 @@ namespace NotesApplication.Controllers
         }
 
         // GET: Notes/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(Guid id)
         {
             var userId = GetCurrentUserId();
-            if (userId == 0)
+            if (userId == Guid.Empty)
                 return RedirectToAction("Login", "Account");
                 
             var note = _noteRepository.GetById(id);
@@ -96,7 +134,7 @@ namespace NotesApplication.Controllers
         public ActionResult Edit(Note note)
         {
             var userId = GetCurrentUserId();
-            if (userId == 0)
+            if (userId == Guid.Empty)
                 return RedirectToAction("Login", "Account");
                 
             if (ModelState.IsValid)
@@ -118,10 +156,10 @@ namespace NotesApplication.Controllers
         }
 
         // GET: Notes/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(Guid id)
         {
             var userId = GetCurrentUserId();
-            if (userId == 0)
+            if (userId == Guid.Empty)
                 return RedirectToAction("Login", "Account");
                 
             var note = _noteRepository.GetById(id);
@@ -135,10 +173,10 @@ namespace NotesApplication.Controllers
         // POST: Notes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult DeleteConfirmed(Guid id)
         {
             var userId = GetCurrentUserId();
-            if (userId == 0)
+            if (userId == Guid.Empty)
                 return RedirectToAction("Login", "Account");
                 
             var note = _noteRepository.GetById(id);
@@ -151,19 +189,19 @@ namespace NotesApplication.Controllers
             return RedirectToAction("Index");
         }
 
-        private int GetCurrentUserId()
+        private Guid GetCurrentUserId()
         {
             var cookie = Request.Cookies["auth_token"];
             if (cookie == null)
-                return 0;
-                
+                return Guid.Empty;
+
             var principal = JwtHelper.ValidateToken(cookie.Value);
             if (principal == null)
-                return 0;
-                
+                return Guid.Empty;
+
             var identity = principal.Identity as ClaimsIdentity;
             var userIdClaim = identity?.FindFirst(ClaimTypes.NameIdentifier);
-            return int.Parse(userIdClaim?.Value ?? "0");
+            return Guid.TryParse(userIdClaim?.Value, out var guid) ? guid : Guid.Empty;
         }
     }
 }

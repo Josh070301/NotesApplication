@@ -5,12 +5,14 @@ using Owin;
 using System;
 using System.Configuration;
 using System.Text;
+using NotesApplication.Helpers;
 
 namespace NotesApplication
 {
     public partial class Startup
     {
-        private static string Secret = ConfigurationManager.AppSettings["JwtSecret"] ?? "TestJWTSecretKey";
+        // Get JWT secret from environment variables or fallback to web.config
+        private static string Secret = EnvHelper.GetEnvironmentVariable("JWT_SECRET") ?? "";
         
         public void ConfigureAuth(IAppBuilder app)
         {

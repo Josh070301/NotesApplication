@@ -1,21 +1,105 @@
 @model IEnumerable<NotesApplication.Models.Note>
+@using NotesApplication.ViewModels
 
 @{
     ViewBag.Title = "My Notes";
+    var filter = ViewBag.Filter as NoteFilterViewModel ?? new NoteFilterViewModel();
 }
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>My Notes</h2>
-        <a href="@Url.Action("Create", "Notes")" class="btn btn-success">
-            <i class="fa fa-plus"></i> Create New Note
-        </a>
+        <div>
+            <button id="searchToggleBtn" class="btn btn-outline-primary mr-2" type="button" data-toggle="collapse" data-target="#filterSection" aria-expanded="false" aria-controls="filterSection">
+                <i class="fa fa-search"></i> Search Notes
+            </button>
+            <a href="@Url.Action("Create", "Notes")" class="btn btn-success">
+                <i class="fa fa-plus"></i> Create New Note
+            </a>
+        </div>
     </div>
+
+    <!-- Filter Form - Collapsed by default -->
+    <div class="collapse mb-4" id="filterSection">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Filter Notes</h5>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("Index", "Notes", FormMethod.Get, new { @class = "form-inline" }))
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-2">
+                                <label class="mr-2">Title:</label>
+                                <input type="text" name="TitleSearch" class="form-control" value="@filter.TitleSearch" />
+                            </div>
+                            <div class="form-group mb-2">
+                                <label class="mr-2">Content:</label>
+                                <input type="text" name="ContentSearch" class="form-control" value="@filter.ContentSearch" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-2">
+                                <label class="mr-2">Sort by Creation Date:</label>
+                                <select name="CreatedAtSortOrder" class="form-control">
+                                    <option value="@SortOrder.None" @(filter.CreatedAtSortOrder == SortOrder.None ? "selected" : "")>Default</option>
+                                    <option value="@SortOrder.Ascending" @(filter.CreatedAtSortOrder == SortOrder.Ascending ? "selected" : "")>Oldest First</option>
+                                    <option value="@SortOrder.Descending" @(filter.CreatedAtSortOrder == SortOrder.Descending ? "selected" : "")>Newest First</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-2">
+                                <label class="mr-2">Sort by Last Update:</label>
+                                <select name="UpdatedAtSortOrder" class="form-control">
+                                    <option value="@SortOrder.None" @(filter.UpdatedAtSortOrder == SortOrder.None ? "selected" : "")>Default</option>
+                                    <option value="@SortOrder.Ascending" @(filter.UpdatedAtSortOrder == SortOrder.Ascending ? "selected" : "")>Oldest First</option>
+                                    <option value="@SortOrder.Descending" @(filter.UpdatedAtSortOrder == SortOrder.Descending ? "selected" : "")>Newest First</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-filter"></i> Apply Filters
+                        </button>
+                        <a href="@Url.Action("Index", "Notes")" class="btn btn-outline-secondary">
+                            <i class="fa fa-undo"></i> Reset
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (filter.HasFilters)
+    {
+        <div class="alert alert-info mb-4">
+            <h5><i class="fa fa-filter"></i> Active Filters:</h5>
+            <ul class="mb-0">
+                @if (!string.IsNullOrEmpty(filter.TitleSearch))
+                {
+                    <li>Title contains: <strong>@filter.TitleSearch</strong></li>
+                }
+                @if (!string.IsNullOrEmpty(filter.ContentSearch))
+                {
+                    <li>Content contains: <strong>@filter.ContentSearch</strong></li>
+                }
+                @if (filter.CreatedAtSortOrder != SortOrder.None)
+                {
+                    <li>Sorted by creation date: <strong>@(filter.CreatedAtSortOrder == SortOrder.Ascending ? "Oldest first" : "Newest first")</strong></li>
+                }
+                @if (filter.UpdatedAtSortOrder != SortOrder.None)
+                {
+                    <li>Sorted by update date: <strong>@(filter.UpdatedAtSortOrder == SortOrder.Ascending ? "Oldest first" : "Newest first")</strong></li>
+                }
+            </ul>
+        </div>
+    }
 
     @if (!Model.Any())
     {
         <div class="alert alert-info">
-            <p>You don't have any notes yet. Click the "Create New Note" button to get started!</p>
+            <p>@(filter.HasFilters ? "No notes match your filter criteria." : "You don't have any notes yet. Click the \"Create New Note\" button to get started!")</p>
         </div>
     }
     else
@@ -62,3 +146,39 @@
         </div>
     }
 </div>
+@section scripts {
+    <script>
+        $(function () {
+            // Enhanced toggle button for better compatibility
+            $("#searchToggleBtn").on("click", function () {
+                $("#filterSection").collapse("toggle");
+            });
+
+            @if (filter.HasFilters) {
+                <text>
+                // Auto-open filter if there are active filters
+                $("#filterSection").collapse("show");
+                </text>
+            }
+
+            // Fallback for older browsers or if Bootstrap JS isn't fully loaded
+            if (typeof $("#filterSection").collapse !== "function") {
+                $("#searchToggleBtn").on("click", function () {
+                    var filterSection = document.getElementById("filterSection");
+                    if (filterSection.style.display === "none" || filterSection.style.display === "") {
+                        filterSection.style.display = "block";
+                    } else {
+                        filterSection.style.display = "none";
+                    }
+                });
+
+                @if (filter.HasFilters) {
+                    <text>
+                    // Auto-show filter section with fallback method if there are active filters
+                    document.getElementById("filterSection").style.display = "block";
+                    </text>
+                }
+            }
+        });
+    </script>
+}

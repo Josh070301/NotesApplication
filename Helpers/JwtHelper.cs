@@ -9,27 +9,29 @@ namespace NotesApplication.Helpers
 {
     public static class JwtHelper
     {
-        private static readonly string Secret = ConfigurationManager.AppSettings["JwtSecret"] ?? "YourSecretKeyHereMakeItLongAndComplex";
+        // Get JWT secret from environment variables or fallback to web.config
+        private static readonly string Secret = EnvHelper.GetEnvironmentVariable("JWT_SECRET") ?? "";
         
-        public static string GenerateToken(int userId, string username, string email)
+        public static string GenerateToken(Guid userId, string username, string email)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Secret);
-            
+
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()), // REQUIRED for AntiForgery
+                new Claim(ClaimTypes.Name, username),
+            };
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                    new Claim(ClaimTypes.Name, username),
-                    new Claim(ClaimTypes.Email, email)
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key), 
+                    new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256Signature)
             };
-            
+
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }

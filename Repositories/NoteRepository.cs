@@ -1,5 +1,6 @@
 using NotesApplication.Interfaces;
 using NotesApplication.Models;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -20,29 +21,39 @@ namespace NotesApplication.Repositories
             return _context.Notes.Include(n => n.User).ToList();
         }
 
-        public IEnumerable<Note> GetAllByUserId(int userId)
+        public IEnumerable<Note> GetAllByUserId(Guid userId)
         {
             return _context.Notes.Where(n => n.UserId == userId).ToList();
         }
 
-        public Note GetById(int id)
+        public Note GetById(Guid id)
         {
             return _context.Notes.Find(id);
         }
 
         public void Add(Note note)
         {
+            if (note.Id == Guid.Empty)
+                note.Id = Guid.NewGuid();
             _context.Notes.Add(note);
             _context.SaveChanges();
         }
 
         public void Update(Note note)
         {
-            _context.Entry(note).State = EntityState.Modified;
-            _context.SaveChanges();
+            var existingNote = _context.Notes.Find(note.Id);
+            if (existingNote != null)
+            {
+                // Update only the properties you want to allow to change
+                existingNote.Title = note.Title;
+                existingNote.Content = note.Content;
+                existingNote.UpdatedAt = note.UpdatedAt;
+
+                _context.SaveChanges();
+            }
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             var note = _context.Notes.Find(id);
             if (note != null)
