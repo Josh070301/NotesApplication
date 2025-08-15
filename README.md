@@ -67,7 +67,11 @@ git clone https://github.com/Josh070301/NotesApplication.git
 	- Update connection string in Web.config
 	- The application uses Code First migrations
 	- Database will initialize with seed data automatically
-	- Modify dotenv to use your server
+	- Modify web.config
+	```<connectionStrings>
+		<add name="NotesDbConnection" connectionString="Data Source=YOUR DEVICE\SQLEXPRESS;Initial Catalog=NotesDB;Integrated Security=True" providerName="System.Data.SqlClient" />
+	  </connectionStrings>
+	```
 
 4. **NuGet Packages**
 	The following packages are required:
