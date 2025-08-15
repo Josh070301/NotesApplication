@@ -1,33 +1,194 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Home";
 }
 
-<main>
-    <section class="row" aria-labelledby="aspnetTitle">
-        <h1 id="title">ASP.NET</h1>
-        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-        <p><a href="https://asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
-    </section>
-
-    <div class="row">
-        <section class="col-md-4" aria-labelledby="gettingStartedTitle">
-            <h2 id="gettingStartedTitle">Getting started</h2>
-            <p>
-                ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-                enables a clean separation of concerns and gives you full control over markup
-                for enjoyable, agile development.
-            </p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="librariesTitle">
-            <h2 id="librariesTitle">Get more libraries</h2>
-            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="hostingTitle">
-            <h2 id="hostingTitle">Web Hosting</h2>
-            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-        </section>
+<!-- Hero Section -->
+<div class="jumbotron bg-dark text-white rounded">
+    <div class="container p-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="display-4">Welcome to Notes App</h1>
+                <p class="lead">
+                    A secure, efficient way to create and manage your personal notes with JWT authentication.
+                </p>
+                @if (Request.Cookies["auth_token"] != null)
+                {
+                    <a href="@Url.Action("Index", "Notes")" class="btn btn-primary btn-lg mt-3">
+                        <i class="fa fa-book"></i> Go to My Notes
+                    </a>
+                }
+                else
+                {
+                    <div class="mt-4">
+                        <a href="@Url.Action("Login", "Account")" class="btn btn-primary btn-lg mr-2">
+                            <i class="fa fa-sign-in-alt"></i> Login
+                        </a>
+                        <a href="@Url.Action("Register", "Account")" class="btn btn-outline-light btn-lg">
+                            <i class="fa fa-user-plus"></i> Register
+                        </a>
+                    </div>
+                }
+            </div>
+            <div class="col-md-4 d-none d-md-block">
+                <i class="fa fa-sticky-note fa-10x text-primary opacity-50 float-right"></i>
+            </div>
+        </div>
     </div>
-</main>
+</div>
+
+<!-- Features Section -->
+<div class="container mb-5 mt-4">
+    <h2 class="text-center mb-4">Key Features</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fa fa-lock fa-3x text-primary mb-3"></i>
+                    <h4>Secure Authentication</h4>
+                    <p>JWT-based authentication keeps your notes private and secure.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fa fa-search fa-3x text-primary mb-3"></i>
+                    <h4>Filtering</h4>
+                    <p>Filter and sort notes by title, content, and dates.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fa fa-mobile-alt fa-3x text-primary mb-3"></i>
+                    <h4>Responsive Design</h4>
+                    <p>Access your notes on any device with our mobile-friendly interface.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Future Implementation Section -->
+<div class="container mb-5">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+            <h3>Future Implementations</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="d-flex">
+                        <div class="mr-3">
+                            <i class="fa fa-chart-pie text-primary fa-2x"></i>
+                        </div>
+                        <div class="m-lg-1">
+                            <h4>Data Insights</h4>
+                            <p>Visual dashboards showing your note creation patterns and activity over time.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="d-flex">
+                        <div class="mr-3">
+                            <i class="fa fa-chart-bar text-primary fa-2x"></i>
+                        </div>
+                        <div class="m-lg-1">
+                            <h4>Analytics</h4>
+                            <p>Analytics on note length, frequency, and topic distribution to understand your note-taking habits.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="d-flex">
+                        <div class="mr-3">
+                            <i class="fa fa-spell-check text-primary fa-2x"></i>
+                        </div>
+                        <div class="m-lg-1">
+                            <h4>Content Analysis</h4>
+                            <p>Automatic spell checking, readability scoring, and content suggestions.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="d-flex">
+                        <div class="mr-3">
+                            <i class="fa fa-tags text-primary fa-2x"></i>
+                        </div>
+                        <div class="m-lg-1">
+                            <h4>Tagging System</h4>
+                            <p>Categorize and organize notes with customizable tags and color coding.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="d-flex">
+                        <div class="mr-3">
+                            <i class="fa fa-share-alt text-primary fa-2x"></i>
+                        </div>
+                        <div class="m-lg-1">
+                            <h4>Sharing Options</h4>
+                            <p>Securely share specific notes with others via email or secure links.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="d-flex">
+                        <div class="mr-3">
+                            <i class="fa fa-bell text-primary fa-2x"></i>
+                        </div>
+                        <div class="m-lg-1">
+                            <h4>Reminders</h4>
+                            <p>Set due dates and reminders for action-oriented notes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- About Section -->
+<div class="container mb-5">
+    <div class="card bg-light">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h3>About This Project</h3>
+                    <p>
+                        This Notes Application was developed by <strong>Joshua Laude</strong> as part of a technical examination for Thurston.
+                        The application demonstrates proficiency in ASP.NET MVC, Entity Framework, JWT authentication,
+                        and modern front-end development using Bootstrap.
+                    </p>
+                    <p>
+                        The project implements the complete MVC pattern with a repository layer for data access,
+                        JWT authentication for security, and responsive design for cross-platform usability.
+                    </p>
+                    <p>
+                        Repository Link: <a target="_blank" href="https://github.com/Josh070301/NotesApplication">https://github.com/Josh070301/NotesApplication</a>
+                    </p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="bg-white p-4 rounded shadow-sm">
+                        <i class="fa fa-code fa-4x text-primary mb-3"></i>
+                        <h5>Joshua Laude</h5>
+                        <p class="text-muted mb-0">Technical Examination</p>
+                        <p class="text-muted">Thurston - @DateTime.Now.Year</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add custom style for opacity -->
+<style>
+    .opacity-50 {
+        opacity: 0.5;
+    }
+
+    .fa-10x {
+        font-size: 10em;
+    }
+</style>
